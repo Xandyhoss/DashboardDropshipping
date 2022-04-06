@@ -1,0 +1,26 @@
+@font-face {
+    font-family: 'Rounded Elegance';
+    src: url('fonts/RoundedElegance-Regular.woff2') format('woff2'),
+        url('fonts/RoundedElegance-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Typo Round';
+    src: url('fonts/typo_round_bold_demo-webfont.woff2') format('woff2'),
+         url('fonts/typo_round_bold_demo-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Bebas';
+    src: url('fonts/bebasneue-regular-webfont.woff2') format('woff2'),
+         url('fonts/bebasneue-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
