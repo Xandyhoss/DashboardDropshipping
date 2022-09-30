@@ -20,7 +20,7 @@
         <li @click="$emit('update-page', 'Report')">
           <i><img src="@/assets/img/icons/reports.png" /></i>Relatórios
         </li>
-        <li @click="$router.push({ path: '/' })">
+        <li @click="logout()">
           <i><img src="@/assets/img/icons/logout.png" /></i>Logout
         </li>
       </ul>
@@ -29,9 +29,15 @@
 </template>
 
 <script>
+import { logoutService } from '@/services/authServices';
 export default {
   setup() {
     return {};
+  },
+  methods: {
+    logout() {
+      logoutService();
+    },
   },
 };
 </script>

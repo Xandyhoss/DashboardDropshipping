@@ -22,11 +22,24 @@
             <th class="hide">compras</th>
             <th class="top-right">opções</th>
           </tr>
-          <tr>
-            <td @click="$emit('update-page', 'DetailsClient')">1</td>
-            <td>Alexandre Harrison</td>
-            <td class="hide">Teixeira de Freitas</td>
-            <td class="hide">20</td>
+          <tr v-for="client in this.clients" :key="client.id">
+            <td>
+              {{ client.id }}
+            </td>
+            <td
+              class="cursor-pointer"
+              @click="$emit('update-page', 'DetailsClient')"
+            >
+              {{ client.nome }}
+            </td>
+            <td class="hide">
+              {{
+                client.addresses[0]
+                  ? client.addresses[0].cidade
+                  : 'Não Definida'
+              }}
+            </td>
+            <td class="hide">{{ client.compras.length }}</td>
             <td>
               <i class="fas fa-edit icon"></i>
               <i class="fas fa-trash icon"></i>
@@ -39,9 +52,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   setup() {
     return {};
+  },
+  computed: {
+    ...mapState({ clients: (state) => state.clients.clients }),
+  },
+  beforeMount() {
+    this.$emit('updateData');
   },
 };
 </script>
@@ -168,6 +188,16 @@ export default {
   text-align: center;
   padding: 10px;
   border: 1px solid rgba(170, 32, 111, 1);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cursor-pointer:hover {
+  background-color: #c2c2c2;
+  transition: 0.2s;
 }
 @media (min-width: 1920px) {
   .container-clients {

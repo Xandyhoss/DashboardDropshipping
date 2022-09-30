@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Loading v-if="this.loading" />
     <MobileNav class="mobile-nav" @update-page="Update" />
     <Nav class="desktop-nav" @update-page="Update" />
     <transition
@@ -11,6 +12,7 @@
         class="dynamic-component"
         :is="currentView"
         @update-page="Update"
+        @update-data="fetchData"
       />
     </transition>
   </div>
@@ -30,6 +32,15 @@ import AddSell from '@/components/AddSell.vue';
 import DetailsClient from '@/components/DetailsClient.vue';
 import DetailsProduct from '@/components/DetailsProduct.vue';
 import DetailsSell from '@/components/DetailsSell.vue';
+import Loading from '@/components/Loading.vue';
+import { mapMutations, mapState } from 'vuex';
+import { SET_CLIENTS } from '@/store/modules/clients';
+import { SET_LOADING } from '@/store/modules/loading';
+import { SET_PRODUCTS } from '@/store/modules/products';
+import { SET_SELLS } from '@/store/modules/sells';
+import { getClientsService } from '@/services/clientsService';
+import { getProductsService } from '@/services/productsService';
+import { getSellsService } from '@/services/sellsService';
 
 export default {
   data() {
@@ -49,11 +60,62 @@ export default {
     DetailsProduct,
     DetailsSell,
     AddSell,
+    Loading,
   },
   methods: {
     Update(page) {
       this.currentView = page;
     },
+    fetchData() {
+      this.getClientsList();
+      this.getProductsList();
+      this.getSellsList();
+    },
+    ...mapMutations('clients', { setClients: SET_CLIENTS }),
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    ...mapMutations('products', { setProducts: SET_PRODUCTS }),
+    ...mapMutations('sells', { setSells: SET_SELLS }),
+    async getClientsList() {
+      try {
+        this.setLoading(true);
+        const { data } = await getClientsService();
+        data.length > 0 ? this.setClients(data) : null;
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async getProductsList() {
+      try {
+        this.setLoading(true);
+        const { data } = await getProductsService();
+        data.length > 0 ? this.setProducts(data) : null;
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async getSellsList() {
+      try {
+        this.setLoading(true);
+        const { data } = await getSellsService();
+        data.length > 0 ? this.setSells(data) : null;
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+  },
+  computed: {
+    ...mapState({
+      loading: (state) => state.loading.loading,
+    }),
+  },
+  created() {
+    this.fetchData();
   },
 };
 </script>

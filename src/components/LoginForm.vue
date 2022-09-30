@@ -6,13 +6,19 @@
     <div class="form">
       <p class="title">PAINEL DE CONTROLE</p>
       <div class="form-group">
-        <input type="text" placeholder="Usuário" class="form-field" />
-        <input type="password" placeholder="Senha" class="form-field" />
-        <button
-          type="submit"
-          class="submit-button"
-          @click="$router.push({ path: '/dashboard' })"
-        >
+        <input
+          type="text"
+          placeholder="Usuário"
+          class="form-field"
+          v-model="username"
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          class="form-field"
+          v-model="password"
+        />
+        <button type="submit" class="submit-button" @click="login()">
           Entrar
         </button>
       </div>
@@ -22,9 +28,36 @@
 </template>
 
 <script>
+import { loginService } from '@/services/authServices.js';
+import { useToast } from 'vue-toastification';
+import { mapMutations } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+
 export default {
   setup() {
-    return {};
+    const toast = useToast();
+    return { toast };
+  },
+  data() {
+    return {
+      username: '',
+      password: '',
+    };
+  },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async login() {
+      if (this.username !== '' && this.password !== '') {
+        try {
+          this.setLoading(true);
+          await loginService(this.username, this.password);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          this.setLoading(false);
+        }
+      }
+    },
   },
 };
 </script>
@@ -34,11 +67,10 @@ export default {
   display: grid;
   grid-template-rows: 220px 1fr 5px;
   border-radius: 20px 20px 0px 0px;
-  align-self: center;
-  justify-self: center;
   width: 480px;
   height: 560px;
   background-color: white;
+  overflow-x: hidden;
 }
 .bottomline {
   height: 5px;

@@ -10,11 +10,26 @@
       <div class="client-form">
         <div class="personal-info">
           <h2 class="group-title">informações pessoais</h2>
-          <input type="text" class="input-field" placeholder="nome" />
-          <input type="text" class="input-field" placeholder="cpf" />
-          <input type="text" class="input-field" placeholder="telefone" />
+          <input
+            type="text"
+            class="input-field"
+            placeholder="nome"
+            v-model="nome"
+          />
+          <input
+            type="text"
+            class="input-field"
+            placeholder="cpf"
+            v-model="cpf"
+          />
+          <input
+            type="text"
+            class="input-field"
+            placeholder="telefone"
+            v-model="telefone"
+          />
         </div>
-        <div class="address-info">
+        <!-- <div class="address-info">
           <h2 class="group-title">endereço</h2>
           <input type="text" class="input-field" placeholder="rua" />
           <input type="text" class="input-field" placeholder="nº" />
@@ -26,9 +41,9 @@
             class="input-field"
             placeholder="ponto de referência"
           />
-        </div>
+        </div> -->
         <div class="buttons">
-          <button class="submit-button">
+          <button class="submit-button" @click="createClient()">
             <i class="fas fa-plus-circle"></i>cadastrar
           </button>
           <button
@@ -44,9 +59,39 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+import { createNewClientService } from '../services/clientsService';
+import { useToast } from 'vue-toastification';
 export default {
   setup() {
-    return {};
+    const toast = useToast();
+    return { toast };
+  },
+  data() {
+    return {
+      nome: '',
+      cpf: '',
+      telefone: '',
+    };
+  },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async createClient() {
+      try {
+        this.setLoading(true);
+        const client = await createNewClientService(
+          this.nome,
+          this.cpf,
+          this.telefone
+        );
+        if (client) this.$emit('update-page', 'Clients');
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 };
 </script>

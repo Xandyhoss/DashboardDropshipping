@@ -4,32 +4,32 @@
       <div class="title"><h1>relatórios</h1></div>
       <div class="billed">
         <div class="report-title">MONTANTE FATURADO</div>
-        <div class="value">R$156,76</div>
+        <div class="value">R${{ getTotalReceived.toFixed(2) }}</div>
       </div>
       <div class="pending">
-        <div class="report-title">MONTANTE FATURADO</div>
-        <div class="value">R$156,76</div>
+        <div class="report-title">MONTANTE A RECEBER</div>
+        <div class="value">R${{ getTotalPending.toFixed(2) }}</div>
       </div>
       <div class="report-info">
         <div class="report-item">
           <div class="report-item-title"><h2>mais vendido</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">SMARTWATCH M4</div>
+          <div class="report-item-info">{{ getMostSoldProduct() }}</div>
         </div>
         <div class="report-item">
           <div class="report-item-title"><h2>vendas concluídas</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">126</div>
+          <div class="report-item-info">{{ finishedSells.length }}</div>
         </div>
         <div class="report-item">
           <div class="report-item-title"><h2>vendas em aberto</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">45</div>
+          <div class="report-item-info">{{ pendingSells.length }}</div>
         </div>
         <div class="report-item">
           <div class="report-item-title"><h2>vendas canceladas</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">12</div>
+          <div class="report-item-info">{{ canceledSells.length }}</div>
         </div>
       </div>
     </div>
@@ -37,9 +37,65 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   setup() {
     return {};
+  },
+  computed: {
+    ...mapState({ sells: (state) => state.sells.sells }),
+    ...mapState({ products: (state) => state.products.products }),
+    pendingSells() {
+      function getPending(value) {
+        if (value.status === 'pending_payment') {
+          return value;
+        }
+      }
+      return this.sells.filter(getPending);
+    },
+    finishedSells() {
+      function getFinished(value) {
+        if (value.status === 'finished') {
+          return value;
+        }
+      }
+      return this.sells.filter(getFinished);
+    },
+    canceledSells() {
+      function getCanceled(value) {
+        if (value.status === 'canceled') {
+          return value;
+        }
+      }
+      return this.sells.filter(getCanceled);
+    },
+    getTotalReceived() {
+      const finishedSells = this.finishedSells;
+      let totalReceived = finishedSells.reduce(function (accumulator, sell) {
+        return accumulator + sell.value;
+      }, 0);
+      return totalReceived;
+    },
+    getTotalPending() {
+      const pendingSells = this.pendingSells;
+      let totalPending = pendingSells.reduce(function (accumulator, sell) {
+        return accumulator + sell.value;
+      }, 0);
+      return totalPending;
+    },
+  },
+  beforeMount() {
+    this.$emit('updateData');
+  },
+  methods: {
+    getMostSoldProduct() {
+      const products = this.products.sort(
+        (a, b) => b.vendas.length - a.vendas.length
+      );
+      if (products.length > 0 && products[0].vendas.length > 0)
+        return products[0].produto;
+      return 'Nenhum';
+    },
   },
 };
 </script>

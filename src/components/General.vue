@@ -3,39 +3,39 @@
     <div class="content-general">
       <div class="billed">
         <div class="title">MONTANTE FATURADO</div>
-        <div class="value">R$156,76</div>
+        <div class="value">R${{ getTotalReceived.toFixed(2) }}</div>
       </div>
       <div class="pending">
-        <div class="title">MONTANTE FATURADO</div>
-        <div class="value">R$156,76</div>
+        <div class="title">MONTANTE A RECEBER</div>
+        <div class="value">R${{ getTotalPending.toFixed(2) }}</div>
       </div>
       <div class="general-info">
         <div class="box">
           <div class="icon">
             <img src="@/assets/img/icons/big-sales.png" />
           </div>
-          <div class="quantity">12</div>
+          <div class="quantity">{{ finishedSells.length }}</div>
           <div class="info-title">VENDAS CONCLUÍDAS</div>
         </div>
         <div class="box">
           <div class="icon">
             <img src="@/assets/img/icons/big-sales.png" />
           </div>
-          <div class="quantity">3</div>
+          <div class="quantity">{{ pendingSells.length }}</div>
           <div class="info-title">VENDAS PENDENTES</div>
         </div>
         <div class="box">
           <div class="icon">
             <img src="@/assets/img/icons/big-products.png" />
           </div>
-          <div class="quantity">12</div>
+          <div class="quantity">{{ this.products.length }}</div>
           <div class="info-title">PRODUTOS CADASTRADOS</div>
         </div>
         <div class="box">
           <div class="icon">
             <img src="@/assets/img/icons/big-clients.png" />
           </div>
-          <div class="quantity">12</div>
+          <div class="quantity">{{ this.clients.length }}</div>
           <div class="info-title">CLIENTES CADASTRADOS</div>
         </div>
       </div>
@@ -44,9 +44,50 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   setup() {
     return {};
+  },
+  methods: {},
+  computed: {
+    ...mapState({ clients: (state) => state.clients.clients }),
+    ...mapState({ products: (state) => state.products.products }),
+    ...mapState({ sells: (state) => state.sells.sells }),
+    pendingSells() {
+      function getPending(value) {
+        if (value.status === 'pending_payment') {
+          return value;
+        }
+      }
+      return this.sells.filter(getPending);
+    },
+    finishedSells() {
+      function getFinished(value) {
+        if (value.status !== 'pending_payment') {
+          return value;
+        }
+      }
+      return this.sells.filter(getFinished);
+    },
+    getTotalReceived() {
+      const finishedSells = this.finishedSells;
+      let totalReceived = finishedSells.reduce(function (accumulator, sell) {
+        return accumulator + sell.value;
+      }, 0);
+      return totalReceived;
+    },
+    getTotalPending() {
+      const pendingSells = this.pendingSells;
+      let totalPending = pendingSells.reduce(function (accumulator, sell) {
+        return accumulator + sell.value;
+      }, 0);
+      return totalPending;
+    },
+  },
+
+  beforeMount() {
+    this.$emit('updateData');
   },
 };
 </script>

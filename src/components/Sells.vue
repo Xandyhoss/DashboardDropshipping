@@ -17,20 +17,22 @@
         <table class="sales-table">
           <tr>
             <th class="top-left">id</th>
-            <th>produto</th>
             <th>cliente</th>
             <th class="hide">data</th>
             <th class="hide">valor</th>
             <th class="top-right">status</th>
           </tr>
-          <tr>
+          <tr v-for="sell in this.sells" :key="sell.id">
             <td @click="$emit('update-page', 'DetailsSell')">01</td>
-            <td>Smartwatch M4</td>
-            <td>Alexandre Harrison</td>
-            <td class="hide">20/20/2021</td>
-            <td class="hide">R$ 65,00</td>
+            <td>{{ getClientNameById(sell.clientId) }}</td>
+            <td class="hide">
+              {{ format(parseISO(sell.createdAt), 'dd/MM/yyyy') }}
+            </td>
+            <td class="hide">R$ {{ sell.value.toFixed(2) }}</td>
             <td>
-              <div class="status">Entregue</div>
+              <div class="status" :class="getBackgroundByStatus(sell.status)">
+                {{ getStatus(sell.status) }}
+              </div>
             </td>
           </tr>
         </table>
@@ -40,14 +42,68 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { format, parseISO } from 'date-fns';
 export default {
+  data() {
+    return {
+      format,
+      parseISO,
+    };
+  },
   setup() {
     return {};
+  },
+  methods: {
+    getClientNameById(id) {
+      function getClientName(client) {
+        if (client.id === id) {
+          return client;
+        }
+      }
+      return this.clients.filter(getClientName)[0].nome;
+    },
+    getStatus(status) {
+      switch (status) {
+        case 'pending_payment':
+          return 'Pagamento Pendente';
+        case 'finished':
+          return 'Finalizada';
+        case 'canceled':
+          return 'Cancelada';
+      }
+    },
+    getBackgroundByStatus(status) {
+      switch (status) {
+        case 'pending_payment':
+          return { 'background-orange': true };
+        case 'finished':
+          return { 'background-green': true };
+        case 'canceled':
+          return { 'background-red': true };
+      }
+    },
+  },
+  computed: {
+    ...mapState({ sells: (state) => state.sells.sells }),
+    ...mapState({ clients: (state) => state.clients.clients }),
+  },
+  beforeMount() {
+    this.$emit('updateData');
   },
 };
 </script>
 
 <style scoped>
+.background-green {
+  background-color: rgb(1, 252, 1);
+}
+.background-orange {
+  background-color: #fa6603;
+}
+.background-red {
+  background-color: #ff1100;
+}
 .container-sales {
   background-color: #e8e6e6;
   display: grid;
@@ -171,7 +227,6 @@ export default {
   border: 1px solid rgba(170, 32, 111, 1);
 }
 .status {
-  background-color: rgb(7, 224, 7);
   border-radius: 10px;
   padding: 3px;
 }

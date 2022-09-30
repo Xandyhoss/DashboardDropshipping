@@ -24,13 +24,22 @@
             <th>link externo</th>
             <th class="top-right">opções</th>
           </tr>
-          <tr>
-            <td @click="$emit('update-page', 'DetailsProduct')">01</td>
-            <td>Smartwatch M4</td>
-            <td class="hide">R$ 35,00</td>
-            <td class="hide">R$ 65,00</td>
-            <td class="hide">8</td>
-            <td><i class="fas fa-link icon"></i></td>
+          <tr v-for="product in products" :key="product.id">
+            <td>01</td>
+            <td
+              class="cursor-pointer"
+              @click="$emit('update-page', 'DetailsProduct')"
+            >
+              {{ product.produto }}
+            </td>
+            <td class="hide">R$ {{ product.valorCusto.toFixed(2) }}</td>
+            <td class="hide">R$ {{ product.valorVenda.toFixed(2) }}</td>
+            <td class="hide">{{ product.vendas.length }}</td>
+            <td>
+              <a :href="product.link" target="_blank"
+                ><i class="fas fa-link icon"></i
+              ></a>
+            </td>
             <td>
               <i class="fas fa-edit icon"></i>
               <i class="fas fa-trash icon"></i>
@@ -43,9 +52,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   setup() {
     return {};
+  },
+  computed: {
+    ...mapState({ products: (state) => state.products.products }),
+  },
+  beforeMount() {
+    this.$emit('updateData');
   },
 };
 </script>
@@ -165,6 +181,7 @@ export default {
 .icon {
   height: 25px;
   margin-inline: 2px;
+  color: black;
 }
 .products-table td {
   font-family: 'Bebas';
@@ -172,6 +189,16 @@ export default {
   text-align: center;
   padding: 10px;
   border: 1px solid rgba(170, 32, 111, 1);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cursor-pointer:hover {
+  background-color: #c2c2c2;
+  transition: 0.2s;
 }
 @media (min-width: 1920px) {
   .container-products {

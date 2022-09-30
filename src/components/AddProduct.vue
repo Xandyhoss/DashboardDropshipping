@@ -13,13 +13,29 @@
             type="text"
             class="input-field"
             placeholder="nome do produto"
+            v-model="produto"
           />
-          <input type="text" class="input-field" placeholder="preço de custo" />
-          <input type="text" class="input-field" placeholder="preço de venda" />
-          <input type="text" class="input-field" placeholder="link externo" />
+          <input
+            type="number"
+            class="input-field"
+            placeholder="preço de custo"
+            v-model="precoCusto"
+          />
+          <input
+            type="number"
+            class="input-field"
+            placeholder="preço de venda"
+            v-model="precoVenda"
+          />
+          <input
+            type="text"
+            class="input-field"
+            placeholder="link externo"
+            v-model="link"
+          />
         </div>
         <div class="buttons">
-          <button class="submit-button">
+          <button class="submit-button" @click="createProduct()">
             <i class="fas fa-plus-circle"></i>cadastrar
           </button>
           <button
@@ -35,9 +51,41 @@
 </template>
 
 <script>
+import { useToast } from 'vue-toastification';
+import { mapMutations } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+import { createNewProductService } from '../services/productsService';
 export default {
   setup() {
-    return {};
+    const toast = useToast();
+    return { toast };
+  },
+  data() {
+    return {
+      produto: '',
+      precoCusto: '',
+      precoVenda: '',
+      link: '',
+    };
+  },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async createProduct() {
+      try {
+        this.setLoading(true);
+        const client = await createNewProductService(
+          this.produto,
+          this.precoCusto,
+          this.precoVenda,
+          this.link
+        );
+        if (client) this.$emit('update-page', 'Products');
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 };
 </script>
