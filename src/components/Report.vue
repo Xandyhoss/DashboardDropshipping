@@ -19,17 +19,23 @@
         <div class="report-item">
           <div class="report-item-title"><h2>vendas concluídas</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">{{ finishedSells.length }}</div>
+          <div class="report-item-info">
+            {{ finishedSells ? finishedSells.length : '0' }}
+          </div>
         </div>
         <div class="report-item">
           <div class="report-item-title"><h2>vendas em aberto</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">{{ pendingSells.length }}</div>
+          <div class="report-item-info">
+            {{ pendingSells ? pendingSells.length : '0' }}
+          </div>
         </div>
         <div class="report-item">
           <div class="report-item-title"><h2>vendas canceladas</h2></div>
           <div class="report-item-line"></div>
-          <div class="report-item-info">{{ canceledSells.length }}</div>
+          <div class="report-item-info">
+            {{ canceledSells ? canceledSells.length : '0' }}
+          </div>
         </div>
       </div>
     </div>
@@ -89,11 +95,13 @@ export default {
   },
   methods: {
     getMostSoldProduct() {
-      const products = this.products.sort(
-        (a, b) => b.vendas.length - a.vendas.length
-      );
-      if (products.length > 0 && products[0].vendas.length > 0)
-        return products[0].produto;
+      if (this.sells.length > 0) {
+        const products = this.products.sort(
+          (a, b) => b.vendas.length - a.vendas.length
+        );
+        if (products.length > 0 && products[0].vendas.length > 0)
+          return products[0].produto;
+      }
       return 'Nenhum';
     },
   },

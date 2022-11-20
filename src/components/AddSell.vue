@@ -11,15 +11,15 @@
         <div class="sell-info">
           <select class="input-select">
             <option selected disabled>cliente</option>
-            <option selected>cliente</option>
-            <option selected>cliente</option>
-            <option selected>cliente</option>
+            <option v-for="client in this.clients" :key="client.id">
+              {{ client.nome }}
+            </option>
           </select>
           <select class="input-select">
             <option selected disabled>produto</option>
-            <option selected>produto</option>
-            <option selected>produto</option>
-            <option selected>produto</option>
+            <option v-for="product in this.products" :key="product.id">
+              {{ product.produto }}
+            </option>
           </select>
         </div>
         <div class="buttons">
@@ -39,9 +39,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   setup() {
     return {};
+  },
+  computed: {
+    ...mapState({ clients: (state) => state.clients.clients }),
+    ...mapState({ products: (state) => state.products.products }),
   },
 };
 </script>

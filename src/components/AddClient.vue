@@ -21,6 +21,7 @@
             class="input-field"
             placeholder="cpf"
             v-model="cpf"
+            maxlength="11"
           />
           <input
             type="text"

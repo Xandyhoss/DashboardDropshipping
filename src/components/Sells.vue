@@ -14,7 +14,7 @@
         </button>
       </div>
       <div class="sales">
-        <table class="sales-table">
+        <table class="sales-table" v-if="sells.length > 0">
           <tr>
             <th class="top-left">id</th>
             <th>cliente</th>
@@ -36,6 +36,9 @@
             </td>
           </tr>
         </table>
+        <div class="else-message" v-else>
+          <p>Nenhuma venda realizada ainda.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -229,6 +232,17 @@ export default {
 .status {
   border-radius: 10px;
   padding: 3px;
+}
+
+.else-message {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.else-message p {
+  font-size: 30px;
+  font-family: 'Bebas';
 }
 @media (min-width: 1920px) {
   .container-sales {

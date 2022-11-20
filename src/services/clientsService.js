@@ -7,6 +7,15 @@ export const getClientsService = async () => {
   return clients;
 };
 
+export const getClientByIdService = async (id) => {
+  try {
+    const client = await axios.get(`/clients/${id}`);
+    return client.data;
+  } catch (error) {
+    console.log(error.response);
+  }
+};
+
 export const createNewClientService = async (nome, cpf, telefone) => {
   try {
     const client = await axios.post('/clients', { nome, cpf, telefone });

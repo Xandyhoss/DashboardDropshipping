@@ -14,7 +14,7 @@
         </button>
       </div>
       <div class="products">
-        <table class="products-table">
+        <table class="products-table" v-if="products.length > 0">
           <tr>
             <th class="top-left">id</th>
             <th>produto</th>
@@ -24,8 +24,8 @@
             <th>link externo</th>
             <th class="top-right">opções</th>
           </tr>
-          <tr v-for="product in products" :key="product.id">
-            <td>01</td>
+          <tr v-for="product in this.products" :key="product.id">
+            <td>{{ product.id }}</td>
             <td
               class="cursor-pointer"
               @click="$emit('update-page', 'DetailsProduct')"
@@ -34,7 +34,9 @@
             </td>
             <td class="hide">R$ {{ product.valorCusto.toFixed(2) }}</td>
             <td class="hide">R$ {{ product.valorVenda.toFixed(2) }}</td>
-            <td class="hide">{{ product.vendas.length }}</td>
+            <td class="hide">
+              {{ product.vendas ? product.vendas.length : '0' }}
+            </td>
             <td>
               <a :href="product.link" target="_blank"
                 ><i class="fas fa-link icon"></i
@@ -46,6 +48,9 @@
             </td>
           </tr>
         </table>
+        <div class="else-message" v-else>
+          <p>Nenhum produto adicionado ainda.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -199,6 +204,17 @@ export default {
 .cursor-pointer:hover {
   background-color: #c2c2c2;
   transition: 0.2s;
+}
+
+.else-message {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.else-message p {
+  font-size: 30px;
+  font-family: 'Bebas';
 }
 @media (min-width: 1920px) {
   .container-products {

@@ -4,7 +4,7 @@ const RESET_STATE = 'RESET_STATE';
 export { SET_SELECTED_CLIENT, RESET_STATE };
 
 const getDefaultState = () => {
-  return [];
+  return {};
 };
 
 const state = getDefaultState();

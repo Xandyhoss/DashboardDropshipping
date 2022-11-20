@@ -13,62 +13,52 @@
           <div class="info-item">
             <div class="info-item-title"><h2>nome</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">Alexandre Harrison</div>
+            <div class="info-item-info">{{ client.nome }}</div>
           </div>
           <div class="info-item">
             <div class="info-item-title"><h2>última compra</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">smartwatch m4</div>
+            <div class="info-item-info">{{ getLastBought() }}</div>
           </div>
           <div class="info-item">
             <div class="info-item-title"><h2>compras feitas</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">5</div>
+            <div class="info-item-info">
+              {{ this.client?.compras?.length }}
+            </div>
           </div>
           <div class="info-item">
             <div class="info-item-title"><h2>cpf</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">700.758.716-02</div>
+            <div class="info-item-info">{{ client.cpf }}</div>
           </div>
           <div class="info-item">
             <div class="info-item-title"><h2>telefone</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">73991013527</div>
+            <div class="info-item-info">{{ client.telefone }}</div>
           </div>
         </div>
         <hr class="separator" />
         <div class="address-info">
-          <h2 class="group-title">informações de endereço</h2>
-          <div class="info-item">
-            <div class="info-item-title"><h2>endereço</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">Rua Venceslau Braz</div>
+          <div class="header-title">
+            <h2 class="group-title">endereços</h2>
+            <button class="add-address-button">
+              <i class="fas fa-plus-circle"></i>adicionar endereço
+            </button>
           </div>
-          <div class="info-item">
-            <div class="info-item-title"><h2>nº</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">302</div>
-          </div>
-          <div class="info-item">
-            <div class="info-item-title"><h2>bairro</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">Santa Rita</div>
-          </div>
-          <div class="info-item">
-            <div class="info-item-title"><h2>cep</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">45990782</div>
-          </div>
-          <div class="info-item">
-            <div class="info-item-title"><h2>complemento</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">ap 02</div>
-          </div>
-          <div class="info-item">
-            <div class="info-item-title"><h2>referência</h2></div>
-            <div class="info-item-line"></div>
-            <div class="info-item-info">rua da arena futgol</div>
-          </div>
+          <ul class="address-list">
+            <li
+              class="address-item"
+              v-for="address in client.addresses"
+              :key="address.id"
+            >
+              <i class="fas fa-map-marker-alt" />
+              {{ address.endereco }}, {{ address.numero }},
+              {{ address.complemento }} - {{ address.bairro }} -
+              {{ address.cidade }} - {{ address.cep }} -
+              {{ address.referencia }}
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -76,14 +66,71 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+import { getClientByIdService } from '../services/clientsService';
+
 export default {
-  setup() {
-    return {};
+  data() {
+    return { client: {} };
+  },
+  computed: {
+    ...mapState({
+      selectedClient: (state) => state.selectedClient.selectedClient,
+    }),
+  },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async getClient() {
+      try {
+        this.setLoading(true);
+        const client = await getClientByIdService(this.selectedClient);
+        this.client = client;
+      } catch (error) {
+        console.log(error.response);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    getLastBought() {
+      if (this.client.compras?.length > 0) {
+        return this.client.compras[this.client.compras.length - 1];
+      }
+      return 'Nenhum';
+    },
+  },
+  beforeMount() {
+    this.getClient();
   },
 };
 </script>
 
 <style scoped>
+.header-title {
+  display: flex;
+  justify-content: space-between;
+}
+.add-address-button {
+  height: 35px;
+  width: auto;
+  padding-inline: 20px;
+  border-radius: 10px;
+  border: none;
+  background: rgb(231, 47, 93);
+  background: linear-gradient(
+    90deg,
+    rgba(231, 47, 93, 1) 10%,
+    rgba(200, 37, 103, 1) 56%,
+    rgba(170, 32, 111, 1) 100%
+  );
+  color: white;
+  font-family: 'Typo Round';
+  font-size: 15px;
+  transition: 0.2s;
+}
+.add-address-button:active {
+  filter: grayscale(1);
+}
 .container-details-client {
   background-color: #e8e6e6;
   display: grid;
@@ -131,12 +178,23 @@ export default {
 }
 .address-info {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-column-gap: 1rem;
   grid-row-gap: 1rem;
-  grid-template-rows: 50px auto;
   margin-top: 1rem;
 }
+.address-list {
+  width: 100%;
+  list-style: none;
+  padding-left: 5px;
+  font-family: 'Bebas Neue';
+  font-size: 25px;
+}
+
+.address-item {
+  border-bottom: 1px solid rgb(212, 212, 212);
+}
+
 .info-item {
   display: grid;
   grid-template-columns: 1fr;
@@ -178,9 +236,6 @@ export default {
 }
 @media (max-width: 1190px) {
   .personal-info {
-    grid-template-columns: 1fr 1fr;
-  }
-  .address-info {
     grid-template-columns: 1fr 1fr;
   }
   .group-title {

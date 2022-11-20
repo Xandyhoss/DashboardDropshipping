@@ -14,7 +14,7 @@
         </button>
       </div>
       <div class="clients">
-        <table class="clients-table">
+        <table class="clients-table" v-if="clients.length > 0">
           <tr>
             <th class="top-left">id</th>
             <th>nome</th>
@@ -26,39 +26,47 @@
             <td>
               {{ client.id }}
             </td>
-            <td
-              class="cursor-pointer"
-              @click="$emit('update-page', 'DetailsClient')"
-            >
+            <td class="cursor-pointer" @click="goToClient(client.id)">
               {{ client.nome }}
             </td>
             <td class="hide">
               {{
-                client.addresses[0]
-                  ? client.addresses[0].cidade
-                  : 'Não Definida'
+                client.addresses ? client.addresses[0].cidade : 'Não Definida'
               }}
             </td>
-            <td class="hide">{{ client.compras.length }}</td>
+            <td class="hide">
+              {{ client.compras ? client.compras.length : '0' }}
+            </td>
             <td>
               <i class="fas fa-edit icon"></i>
               <i class="fas fa-trash icon"></i>
             </td>
           </tr>
         </table>
+        <div class="else-message" v-else>
+          <p>Nenhum cliente adicionado ainda.</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
+import { SET_SELECTED_CLIENT } from '@/store/modules/selectedClient';
 export default {
   setup() {
     return {};
   },
   computed: {
     ...mapState({ clients: (state) => state.clients.clients }),
+  },
+  methods: {
+    ...mapMutations('selectedClient', { setClient: SET_SELECTED_CLIENT }),
+    goToClient(id) {
+      this.setClient(id);
+      this.$emit('update-page', 'DetailsClient');
+    },
   },
   beforeMount() {
     this.$emit('updateData');
@@ -198,6 +206,17 @@ export default {
 .cursor-pointer:hover {
   background-color: #c2c2c2;
   transition: 0.2s;
+}
+
+.else-message {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.else-message p {
+  font-size: 30px;
+  font-family: 'Bebas';
 }
 @media (min-width: 1920px) {
   .container-clients {

@@ -2,6 +2,8 @@ import axios from '@/utils/axios.js';
 import Cookies from 'js-cookie';
 import router from '@/router';
 import { useToast } from 'vue-toastification';
+import store from '@/store';
+
 const toast = useToast();
 
 const loginService = async (username, password) => {
@@ -26,9 +28,10 @@ const isLoggedIn = async () => {
 
 const logoutService = async () => {
   try {
+    store.commit('loading/SET_LOADING', true, { root: true });
     await axios.delete('/auth/');
     Cookies.remove('auth-token');
-    router.push('/');
+    router.go();
   } catch ({ response }) {
     console.log(response);
   }
