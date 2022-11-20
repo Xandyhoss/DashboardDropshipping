@@ -27,3 +27,33 @@ export const createNewClientService = async (nome, cpf, telefone) => {
     toast.error(getMessage, { timeout: 2000 });
   }
 };
+
+export const createNewAddressService = async (
+  clientId,
+  endereco,
+  numero,
+  bairro,
+  cep,
+  complemento,
+  referencia,
+  cidade
+) => {
+  try {
+    const address = await axios.post('/address', {
+      clientId,
+      endereco,
+      numero,
+      bairro,
+      cep,
+      complemento,
+      referencia,
+      cidade,
+    });
+    toast.success('Endereço adicionado com sucesso!', { timeout: 2000 });
+    return address;
+  } catch ({ response }) {
+    console.log(response);
+    const getMessage = response.data.errors[0].message;
+    toast.error(getMessage, { timeout: 2000 });
+  }
+};

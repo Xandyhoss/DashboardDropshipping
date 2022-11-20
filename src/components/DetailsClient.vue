@@ -1,5 +1,12 @@
 <template>
   <div class="container-details-client">
+    <div class="modal-overlay" v-if="showModal">
+      <add-address
+        @toggle-modal="ToggleModal"
+        :id="client.id"
+        @update-page="handleAddAddress"
+      />
+    </div>
     <div class="content-details-client">
       <div class="title">
         <div class="icon" @click="$emit('update-page', 'Clients')">
@@ -42,8 +49,8 @@
         <div class="address-info">
           <div class="header-title">
             <h2 class="group-title">endereços</h2>
-            <button class="add-address-button">
-              <i class="fas fa-plus-circle"></i>adicionar endereço
+            <button class="add-address-button" @click="ToggleModal">
+              <i class="fas fa-plus-circle" />adicionar endereço
             </button>
           </div>
           <ul class="address-list">
@@ -69,10 +76,12 @@
 import { mapMutations, mapState } from 'vuex';
 import { SET_LOADING } from '@/store/modules/loading';
 import { getClientByIdService } from '../services/clientsService';
+import AddAddress from '@/components/AddAddress.vue';
 
 export default {
+  components: { AddAddress },
   data() {
-    return { client: {} };
+    return { client: {}, showModal: false };
   },
   computed: {
     ...mapState({
@@ -98,6 +107,13 @@ export default {
       }
       return 'Nenhum';
     },
+    ToggleModal() {
+      this.showModal = !this.showModal;
+    },
+    handleAddAddress() {
+      this.ToggleModal();
+      this.getClient();
+    },
   },
   beforeMount() {
     this.getClient();
@@ -106,6 +122,16 @@ export default {
 </script>
 
 <style scoped>
+.modal-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #161616a8;
+  z-index: 9999;
+}
 .header-title {
   display: flex;
   justify-content: space-between;
@@ -133,6 +159,7 @@ export default {
 }
 .container-details-client {
   background-color: #e8e6e6;
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
 }
