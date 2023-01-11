@@ -25,7 +25,7 @@
           <div class="info-item">
             <div class="info-item-title"><h2>última compra</h2></div>
             <div class="info-item-line"></div>
-            <div class="info-item-info">{{ getLastBought() }}</div>
+            <div class="info-item-info">R${{ getLastBought().toFixed(2) }}</div>
           </div>
           <div class="info-item">
             <div class="info-item-title"><h2>compras feitas</h2></div>
@@ -103,7 +103,7 @@ export default {
     },
     getLastBought() {
       if (this.client.compras?.length > 0) {
-        return this.client.compras[this.client.compras.length - 1];
+        return this.client.compras[this.client.compras.length - 1].value;
       }
       return 'Nenhum';
     },

@@ -26,16 +26,13 @@
           </tr>
           <tr v-for="product in this.products" :key="product.id">
             <td>{{ product.id }}</td>
-            <td
-              class="cursor-pointer"
-              @click="$emit('update-page', 'DetailsProduct')"
-            >
+            <td class="cursor-pointer" @click="goToProduct(product.id)">
               {{ product.produto }}
             </td>
             <td class="hide">R$ {{ product.valorCusto.toFixed(2) }}</td>
             <td class="hide">R$ {{ product.valorVenda.toFixed(2) }}</td>
             <td class="hide">
-              {{ product.vendas ? product.vendas.length : '0' }}
+              {{ product.vendas?.length || 0 }}
             </td>
             <td>
               <a :href="product.link" target="_blank"
@@ -57,13 +54,21 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
+import { SET_SELECTED_PRODUCT } from '@/store/modules/selectedProduct';
 export default {
   setup() {
     return {};
   },
   computed: {
     ...mapState({ products: (state) => state.products.products }),
+  },
+  methods: {
+    ...mapMutations('selectedProduct', { setProduct: SET_SELECTED_PRODUCT }),
+    goToProduct(id) {
+      this.setProduct(id);
+      this.$emit('update-page', 'DetailsProduct');
+    },
   },
   beforeMount() {
     this.$emit('updateData');

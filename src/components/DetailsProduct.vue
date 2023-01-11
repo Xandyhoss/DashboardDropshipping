@@ -11,32 +11,40 @@
         <div class="info-item">
           <div class="info-item-title"><h2>produto</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">Smartwatch m4</div>
+          <div class="info-item-info">{{ product.produto }}</div>
         </div>
         <div class="info-item">
           <div class="info-item-title"><h2>custo</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">R$ 35,00</div>
+          <div class="info-item-info">
+            R$ {{ parseFloat(product.valorCusto).toFixed(2) }}
+          </div>
         </div>
         <div class="info-item">
           <div class="info-item-title"><h2>venda</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">R$ 65,00</div>
+          <div class="info-item-info">
+            R$ {{ parseFloat(product.valorVenda).toFixed(2) }}
+          </div>
         </div>
         <div class="info-item">
           <div class="info-item-title"><h2>ROI</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">85,7%</div>
+          <div class="info-item-info">{{ getROI() }}%</div>
         </div>
         <div class="info-item">
           <div class="info-item-title"><h2>unidades vendidas</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">8</div>
+          <div class="info-item-info">{{ product.vendas?.length }}</div>
         </div>
         <div class="info-item">
           <div class="info-item-title"><h2>link externo</h2></div>
           <div class="info-item-line"></div>
-          <div class="info-item-info">acesso</div>
+          <div class="info-item-info">
+            <a :href="product.link" target="_blank"
+              ><i class="fas fa-link icon"></i
+            ></a>
+          </div>
         </div>
       </div>
     </div>
@@ -44,9 +52,42 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+import { getProductByIdService } from '../services/productsService';
+
 export default {
-  setup() {
-    return {};
+  data() {
+    return { product: {} };
+  },
+  computed: {
+    ...mapState({
+      selectedProduct: (state) => state.selectedProduct.selectedProduct,
+    }),
+  },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async getProduct() {
+      try {
+        this.setLoading(true);
+        const product = await getProductByIdService(this.selectedProduct);
+        this.product = product;
+      } catch (error) {
+        console.log(error.response);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    getROI() {
+      return Number(
+        ((this.product.valorVenda - this.product.valorCusto) /
+          this.product.valorCusto) *
+          100
+      ).toFixed(2);
+    },
+  },
+  beforeMount() {
+    this.getProduct();
   },
 };
 </script>

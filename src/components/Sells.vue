@@ -70,6 +70,8 @@ export default {
       switch (status) {
         case 'pending_payment':
           return 'Pagamento Pendente';
+        case 'payment_confirmed':
+          return 'Pagamento Confirmado';
         case 'finished':
           return 'Finalizada';
         case 'canceled':
@@ -80,6 +82,8 @@ export default {
       switch (status) {
         case 'pending_payment':
           return { 'background-orange': true };
+        case 'payment_confirmed':
+          return { 'background-blue': true };
         case 'finished':
           return { 'background-green': true };
         case 'canceled':
@@ -106,6 +110,11 @@ export default {
 }
 .background-red {
   background-color: #ff1100;
+  color: white;
+}
+.background-blue {
+  background-color: #413eeb;
+  color: white;
 }
 .container-sales {
   background-color: #e8e6e6;

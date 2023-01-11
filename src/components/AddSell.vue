@@ -2,34 +2,58 @@
   <div class="container-add-sell">
     <div class="content-add-sell">
       <div class="title">
-        <div class="icon" @click="$emit('update-page', 'Products')">
+        <div class="icon" @click="$emit('update-page', 'Sells')">
           <i class="fas fa-backward"></i>
         </div>
         <h1>criar venda</h1>
       </div>
       <div class="sell-form">
         <div class="sell-info">
-          <select class="input-select">
-            <option selected disabled>cliente</option>
-            <option v-for="client in this.clients" :key="client.id">
+          <select class="input-select" v-model="client">
+            <option :value="{}" selected disabled>cliente</option>
+            <option
+              v-for="client in this.clients"
+              :value="client"
+              :key="client.id"
+            >
               {{ client.nome }}
             </option>
           </select>
-          <select class="input-select">
-            <option selected disabled>produto</option>
-            <option v-for="product in this.products" :key="product.id">
-              {{ product.produto }}
+          <select class="input-select" v-model="selectedAddress">
+            <option :value="{}" selected disabled>endereço</option>
+            <option
+              v-for="address in this.addresses"
+              :value="address"
+              :key="address.id"
+            >
+              {{ address.endereco }}, {{ address.numero }} -
+              {{ address.bairro }} -
+              {{ address.cidade }}
             </option>
           </select>
         </div>
+        <div class="products-section">
+          <div
+            class="checkbox-group"
+            v-for="product in this.products"
+            :key="product.id"
+          >
+            <input
+              :id="product.id"
+              type="checkbox"
+              v-model="selectedProducts"
+              :value="product"
+            />
+            <label :for="product.id"
+              >{{ product.id }} | {{ product.produto }}</label
+            >
+          </div>
+        </div>
         <div class="buttons">
-          <button class="submit-button">
+          <button class="submit-button" @click="createSell()">
             <i class="fas fa-plus-circle"></i>cadastrar
           </button>
-          <button
-            class="cancel-button"
-            @click="$emit('update-page', 'Products')"
-          >
+          <button class="cancel-button" @click="$emit('update-page', 'Sells')">
             cancelar
           </button>
         </div>
@@ -39,19 +63,111 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
+import { SET_LOADING } from '@/store/modules/loading';
+import { getClientByIdService } from '../services/clientsService';
+import { createNewSellService } from '../services/sellsService';
+import { useToast } from 'vue-toastification';
+
 export default {
   setup() {
-    return {};
+    const toast = useToast();
+    return { toast };
+  },
+  data() {
+    return {
+      client: {},
+      addresses: {},
+      selectedAddress: {},
+      selectedProducts: [],
+    };
   },
   computed: {
     ...mapState({ clients: (state) => state.clients.clients }),
     ...mapState({ products: (state) => state.products.products }),
   },
+  methods: {
+    ...mapMutations('loading', { setLoading: SET_LOADING }),
+    async getClient() {
+      try {
+        this.setLoading(true);
+        const client = await getClientByIdService(this.client.id);
+        this.addresses = client.addresses;
+      } catch (error) {
+        console.log(error.response);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async createSell() {
+      try {
+        this.setLoading(true);
+
+        const productIds = this.selectedProducts.map((item) => item.id);
+
+        const client = await createNewSellService(
+          this.client.id,
+          this.selectedAddress.id,
+          productIds
+        );
+        if (client) this.$emit('update-page', 'Sells');
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+  },
+  watch: {
+    client() {
+      this.getClient(this.client.id);
+      this.selectedAddress = {};
+    },
+  },
 };
 </script>
 
 <style scoped>
+.products-section {
+  background-color: transparent;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(170, 32, 111, 1);
+  border-radius: 10px;
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  overflow: scroll;
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.checkbox-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background-color: #d6d6d6;
+  padding: 5px;
+  border-radius: 4px;
+  font-family: 'Typo Round';
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.checkbox-group input {
+  width: 18px;
+  height: 18px;
+}
+
+.products-section::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
 .container-add-sell {
   background-color: #e8e6e6;
   display: grid;

@@ -7,6 +7,15 @@ export const getProductsService = async () => {
   return products;
 };
 
+export const getProductByIdService = async (id) => {
+  try {
+    const product = await axios.get(`/products/${id}`);
+    return product.data;
+  } catch (error) {
+    console.log(error.response);
+  }
+};
+
 export const createNewProductService = async (
   produto,
   valorCusto,

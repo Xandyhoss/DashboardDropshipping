@@ -95,11 +95,11 @@ export default {
   },
   methods: {
     getMostSoldProduct() {
-      if (this.sells.length > 0) {
+      if (this.sells?.length > 0) {
         const products = this.products.sort(
-          (a, b) => b.vendas.length - a.vendas.length
+          (a, b) => b.vendas?.length - a.vendas?.length
         );
-        if (products.length > 0 && products[0].vendas.length > 0)
+        if (products?.length > 0 && products[0].vendas?.length > 0)
           return products[0].produto;
       }
       return 'Nenhum';
